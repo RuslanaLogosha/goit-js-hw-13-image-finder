@@ -1,32 +1,51 @@
 import './styles.css';
-import getRefs from './js/get-refs'
-import ImagesApiService from './js/apiService'
+import debounce from 'lodash.debounce';
+import getRefs from './js/get-refs';
+import ImagesApiService from './js/apiService';
 // import onFetchError from './js/fetchError'
-import imagesTpl from './imagesTemplate.hbs'
+import imagesTpl from './imagesTemplate.hbs';
+import LoadMoreBtn from './js/loadMoreBtn';
+
+const loadMoreBtn = new LoadMoreBtn({
+  selector: '[data-action="load-more"]',
+  hidden: true,
+})
 
 
 const refs = getRefs();
 
 const imagesApiService = new ImagesApiService();
 
-refs.searchForm.addEventListener('input', onSearch);
+refs.searchInput.addEventListener('input', debounce(onSearch, 500));
+loadMoreBtn.refs.button.addEventListener('click', fetchImages);
 
-function onSearch(event) {
-  event.preventDefault();
-  imagesApiService.query = event.currentTarget.elements.query.value;
+function onSearch() {
+  imagesApiService.query = refs.searchInput.value;
   if (imagesApiService.query === '') {
     return alert('write down smth')
   }
+  loadMoreBtn.show();
+  imagesApiService.resetPage();
+  clearImagesContainer();
   fetchImages();
 }
 
 function fetchImages() {
+  loadMoreBtn.disable();
   imagesApiService.fetchImages().then(data => {
     console.log(data)
     appendImagesMarkup(data);
-  })
+    loadMoreBtn.enable();
+    if (imagesApiService.page > 2) {
+      window.scrollBy(0, window.innerHeight);
+    }
+  });
 }
 
 function appendImagesMarkup(data) {
-  refs.imagesContainer.innerHTML = imagesTpl(data);
+  refs.imagesContainer.insertAdjacentHTML('beforeend', imagesTpl(data));
+}
+
+function clearImagesContainer() {
+  refs.imagesContainer.innerHTML = '';
 }
