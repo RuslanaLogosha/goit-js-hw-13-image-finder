@@ -30,16 +30,27 @@ function onSearch() {
   fetchImages();
 }
 
-function fetchImages() {
+async function fetchImages() {
   loadMoreBtn.disable();
-  imagesApiService.fetchImages().then(data => {
-    console.log(data)
-    appendImagesMarkup(data);
+  // imagesApiService.fetchImages().then(data => {
+  //   appendImagesMarkup(data);
+  //   loadMoreBtn.enable();
+  //   if (imagesApiService.page > 2) {
+  //     window.scrollBy(0, window.innerHeight);
+  //   }
+  // });
+
+  try {
+    const response = await imagesApiService.fetchImages()
+    const images= appendImagesMarkup(response);
     loadMoreBtn.enable();
     if (imagesApiService.page > 2) {
       window.scrollBy(0, window.innerHeight);
     }
-  });
+    return images;
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 function appendImagesMarkup(data) {
