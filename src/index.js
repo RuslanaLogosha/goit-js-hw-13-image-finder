@@ -2,15 +2,17 @@ import './styles.css';
 import debounce from 'lodash.debounce';
 import getRefs from './js/get-refs';
 import ImagesApiService from './js/apiService';
-// import onFetchError from './js/fetchError'
 import imagesTpl from './imagesTemplate.hbs';
 import LoadMoreBtn from './js/loadMoreBtn';
+import onModalOpen from './js/modalOpen';
+import * as basicLightbox from 'basiclightbox';
+// import bigImageTemplate from './bigImageTemplate.hbs'
+
 
 const loadMoreBtn = new LoadMoreBtn({
   selector: '[data-action="load-more"]',
   hidden: true,
 })
-
 
 const refs = getRefs();
 
@@ -38,12 +40,18 @@ async function fetchImages() {
   //   if (imagesApiService.page > 2) {
   //     window.scrollBy(0, window.innerHeight);
   //   }
+  //   onModalOpen();
   // });
 
   try {
     const response = await imagesApiService.fetchImages()
-    const images= appendImagesMarkup(response);
+    const images = appendImagesMarkup(response);
+    const arrayUrl = response.map(response => response.largeImageURL);
+    const arrayId = response.map(response => response.id);
+    onModalOpen(arrayUrl, arrayId);
+    
     loadMoreBtn.enable();
+    
     if (imagesApiService.page > 2) {
       window.scrollBy(0, window.innerHeight);
     }
@@ -60,3 +68,6 @@ function appendImagesMarkup(data) {
 function clearImagesContainer() {
   refs.imagesContainer.innerHTML = '';
 }
+
+
+

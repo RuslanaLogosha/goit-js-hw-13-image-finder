@@ -15,9 +15,9 @@ export default class ImagesApiService {
         const response = await fetch(url);
         const images = await response.json().then(({ hits}) => {
         this.incrementPage();
-        return hits; });
+            return hits;
+        });
         return images;
-    
     }
 
     incrementPage() {
