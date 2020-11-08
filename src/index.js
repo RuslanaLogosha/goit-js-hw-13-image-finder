@@ -4,9 +4,8 @@ import getRefs from './js/get-refs';
 import ImagesApiService from './js/apiService';
 import imagesTpl from './imagesTemplate.hbs';
 import LoadMoreBtn from './js/loadMoreBtn';
-import onModalOpen from './js/modalOpen';
-import * as basicLightbox from 'basiclightbox';
-// import bigImageTemplate from './bigImageTemplate.hbs'
+// import onModalOpen from './js/modalOpen';
+import onBasicLightBoxOpen from './js/onBasicLightBoxOpen';
 
 
 const loadMoreBtn = new LoadMoreBtn({
@@ -34,6 +33,8 @@ function onSearch() {
 
 async function fetchImages() {
   loadMoreBtn.disable();
+
+  // code with promises:
   // imagesApiService.fetchImages().then(data => {
   //   appendImagesMarkup(data);
   //   loadMoreBtn.enable();
@@ -46,10 +47,13 @@ async function fetchImages() {
   try {
     const response = await imagesApiService.fetchImages()
     const images = appendImagesMarkup(response);
+
+    //  for work of onModalOpen and onBasicLightBoxopen:
     const arrayUrl = response.map(response => response.largeImageURL);
     const arrayId = response.map(response => response.id);
-    onModalOpen(arrayUrl, arrayId);
-    
+    // onModalOpen(arrayUrl, arrayId);
+    onBasicLightBoxOpen(arrayUrl, arrayId);
+
     loadMoreBtn.enable();
     
     if (imagesApiService.page > 2) {

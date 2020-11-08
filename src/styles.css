@@ -70,7 +70,8 @@ img {
 	object-fit: cover;
 }
 
-#lightbox {
+/* styles for modalOpen via lightBox:*/
+/* #lightbox {
 	position: fixed;
 	z-index: 1000;
 	top: 0;
@@ -92,4 +93,4 @@ img {
 	padding: 4px;
 	background-color: black;
 	border: 2px solid white;
-}
+} */

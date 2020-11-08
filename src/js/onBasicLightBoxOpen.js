@@ -1,3 +1,7 @@
+import * as basicLightbox from 'basiclightbox';
+import 'basiclightbox/dist/basicLightbox.min.css';
+
+
 export default function onModalOpen(arrayUrl, arrayId) {
 
     const lightbox = document.createElement('div');
@@ -12,19 +16,10 @@ export default function onModalOpen(arrayUrl, arrayId) {
           const picId = arrayId.find(id => id == clickedImage.id);
           const index = arrayId.indexOf(picId);
           if (picId) {
-              img.src = arrayUrl[index];
-          }
-      
-    while (lightbox.firstChild) {
-      lightbox.removeChild(lightbox.firstChild);
-    }
-      lightbox.appendChild(img);
+              const instance = basicLightbox.create(`
+              <img src="${arrayUrl[index]}" width="800" height="600">`)
+              instance.show()
+          }     
   })
 })
-
-lightbox.addEventListener('click', e => {
-  if (e.target !== e.currentTarget) return
-  lightbox.classList.remove('active')
-})  
 }
-
