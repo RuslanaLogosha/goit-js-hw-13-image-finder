@@ -13,11 +13,10 @@ export default class ImagesApiService {
         // code with promises:
         // return fetch(url).then(response => response.json()).then(({ hits}) => {this.incrementPage(); return hits;});
         
-        const response = await fetch(url).then(data => data.json()).then(({ hits}) => {
+        const response = await fetch(url);
+        const totalResults =  response.json();
         this.incrementPage();
-            return hits;
-        });
-        return response;
+        return totalResults.hits;
     }
 
     incrementPage() {

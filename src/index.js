@@ -6,6 +6,17 @@ import imagesTpl from './imagesTemplate.hbs';
 import LoadMoreBtn from './js/loadMoreBtn';
 // import onModalOpen from './js/modalOpen';
 import onBasicLightBoxOpen from './js/onBasicLightBoxOpen';
+import '@pnotify/core/dist/BrightTheme.css';
+import { error } from '@pnotify/core';
+import { defaults } from '@pnotify/core';
+
+
+
+
+// alert({
+//     text: 'Notice me, senpai!'
+//   });
+
 
 
 const loadMoreBtn = new LoadMoreBtn({
@@ -20,10 +31,17 @@ const imagesApiService = new ImagesApiService();
 refs.searchInput.addEventListener('input', debounce(onSearch, 500));
 loadMoreBtn.refs.button.addEventListener('click', fetchImages);
 
-function onSearch() {
+function onSearch(e) {
+  e.preventDefault();
+
   imagesApiService.query = refs.searchInput.value;
   if (imagesApiService.query === '') {
-    return alert('write down smth')
+    
+  defaults.addClass = 'errorStyle';
+
+   return error({
+    text: 'Please,write down something'
+  });
   }
   loadMoreBtn.show();
   imagesApiService.resetPage();
