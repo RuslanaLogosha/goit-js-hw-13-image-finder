@@ -1,22 +1,15 @@
 import './styles.css';
+import '@pnotify/core/dist/BrightTheme.css';
+import { error } from '@pnotify/core';
+import { defaults } from '@pnotify/core';
+import * as basicLightbox from 'basiclightbox';
+import 'basiclightbox/dist/basicLightbox.min.css';
 import debounce from 'lodash.debounce';
+
 import getRefs from './js/get-refs';
 import ImagesApiService from './js/apiService';
 import imagesTpl from './imagesTemplate.hbs';
 import LoadMoreBtn from './js/loadMoreBtn';
-// import onModalOpen from './js/modalOpen';
-import onBasicLightBoxOpen from './js/onBasicLightBoxOpen';
-import '@pnotify/core/dist/BrightTheme.css';
-import { error } from '@pnotify/core';
-import { defaults } from '@pnotify/core';
-
-
-
-
-// alert({
-//     text: 'Notice me, senpai!'
-//   });
-
 
 
 const loadMoreBtn = new LoadMoreBtn({
@@ -30,6 +23,8 @@ const imagesApiService = new ImagesApiService();
 
 refs.searchInput.addEventListener('input', debounce(onSearch, 500));
 loadMoreBtn.refs.button.addEventListener('click', fetchImages);
+refs.imagesContainer.addEventListener('click', onModalOpen);
+
 
 function onSearch(e) {
   e.preventDefault();
@@ -52,26 +47,18 @@ function onSearch(e) {
 async function fetchImages() {
   loadMoreBtn.disable();
 
-  // code with promises:
-  // imagesApiService.fetchImages().then(data => {
-  //   appendImagesMarkup(data);
-  //   loadMoreBtn.enable();
-  //   if (imagesApiService.page > 2) {
-  //     window.scrollBy(0, window.innerHeight);
-  //   }
-  //   onModalOpen();
-  // });
-
   try {
     const response = await imagesApiService.fetchImages()
     const images = appendImagesMarkup(response);
+    
+    if (response.length === 0) {
+      loadMoreBtn.hide();
+      defaults.addClass = 'errorStyle';
 
-    //  for work of onModalOpen and onBasicLightBoxopen:
-    const arrayUrl = response.map(response => response.largeImageURL);
-    const arrayId = response.map(response => response.id);
-    // onModalOpen(arrayUrl, arrayId);
-    onBasicLightBoxOpen(arrayUrl, arrayId);
-
+      return error({
+      text: 'No results found on your request'
+  });
+    }
     loadMoreBtn.enable();
     
     if (imagesApiService.page > 2) {
@@ -91,5 +78,15 @@ function clearImagesContainer() {
   refs.imagesContainer.innerHTML = '';
 }
 
+function onModalOpen(e) {
+  if (e.target.nodeName !== 'IMG') {
+    return;
+  }
+  const modalMarkup = `
+    <img src=${e.target.dataset.source} width="800" height="600">
+`;
+  const instance = basicLightbox.create(modalMarkup);
 
+  instance.show();
+}
 
