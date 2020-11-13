@@ -1,3 +1,5 @@
+import { parseWithoutProcessing } from "handlebars";
+
 const API_KEY = '18957101-8b16af6433f6d6830b4844a72';
 const BASE_URL = 'https://pixabay.com/api/';
 
@@ -9,7 +11,13 @@ export default class ImagesApiService {
     }
 
     async fetchImages() {
-        const url = `${BASE_URL}/?image_type=photo&orientation=horizontal&q=${this.searchQuery}&page=${this.page}&per_page=12&key=${API_KEY}`;
+        const searchParams = new URLSearchParams({
+            q: this.searchQuery,
+            per_page: 12,
+            page: this.page,
+        });
+        
+        const url = `${BASE_URL}/?image_type=photo&orientation=horizontal&${searchParams}&key=${API_KEY}`;
         // code with promises:
         // return fetch(url).then(response => response.json()).then(({ hits}) => {this.incrementPage(); return hits;});
         

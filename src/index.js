@@ -9,20 +9,13 @@ import debounce from 'lodash.debounce';
 import getRefs from './js/get-refs';
 import ImagesApiService from './js/apiService';
 import imagesTpl from './imagesTemplate.hbs';
-import LoadMoreBtn from './js/loadMoreBtn';
 
-
-const loadMoreBtn = new LoadMoreBtn({
-  selector: '[data-action="load-more"]',
-  hidden: true,
-})
 
 const refs = getRefs();
 
 const imagesApiService = new ImagesApiService();
 
 refs.searchInput.addEventListener('input', debounce(onSearch, 500));
-loadMoreBtn.refs.button.addEventListener('click', fetchImages);
 refs.imagesContainer.addEventListener('click', onModalOpen);
 
 
@@ -38,28 +31,24 @@ function onSearch(e) {
     text: 'Please,write down something'
   });
   }
-  loadMoreBtn.show();
   imagesApiService.resetPage();
   clearImagesContainer();
   fetchImages();
 }
 
 async function fetchImages() {
-  loadMoreBtn.disable();
 
   try {
     const response = await imagesApiService.fetchImages()
     const images = appendImagesMarkup(response);
-    
+
     if (response.length === 0) {
-      loadMoreBtn.hide();
       defaults.addClass = 'errorStyle';
 
       return error({
       text: 'No results found on your request'
   });
     }
-    loadMoreBtn.enable();
     
     if (imagesApiService.page > 2) {
       window.scrollBy(0, window.innerHeight);
@@ -78,6 +67,8 @@ function clearImagesContainer() {
   refs.imagesContainer.innerHTML = '';
 }
 
+
+// Modal window for pics
 function onModalOpen(e) {
   if (e.target.nodeName !== 'IMG') {
     return;
@@ -89,4 +80,24 @@ function onModalOpen(e) {
 
   instance.show();
 }
+
+
+// IntersectionObserver
+const onEntry = entries => {
+
+  entries.forEach(entry => {
+    console.log(imagesApiService.searchQuery);
+        if (entry.isIntersecting && imagesApiService.searchQuery !== "" && imagesApiService.searchQuery !== undefined) {
+          console.log(entry);
+          fetchImages();
+        }  
+    })
+}
+const options = {
+    rootMargin: '150px',
+    // treshold: 0.5,
+};
+const observer = new IntersectionObserver(onEntry, options);
+
+observer.observe(refs.sentinel); 
 
