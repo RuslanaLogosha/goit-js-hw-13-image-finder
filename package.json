@@ -61,6 +61,7 @@
     "lodash": "^4.17.20",
     "lodash.debounce": "^4.0.8",
     "popper.js": "^1.16.1",
-    "react-loader-spinner": "^3.1.14"
+    "react-loader-spinner": "^3.1.14",
+    "vanilla-lazyload": "^17.1.3"
   }
 }

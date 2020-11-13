@@ -18,8 +18,6 @@ export default class ImagesApiService {
         });
         
         const url = `${BASE_URL}/?image_type=photo&orientation=horizontal&${searchParams}&key=${API_KEY}`;
-        // code with promises:
-        // return fetch(url).then(response => response.json()).then(({ hits}) => {this.incrementPage(); return hits;});
         
         const response = await fetch(url);
         const totalResults = await response.json();
@@ -42,8 +40,6 @@ export default class ImagesApiService {
     set query(newQuery) {
         this.searchQuery = newQuery;
     }
-
-
 
 }
 

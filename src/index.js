@@ -9,6 +9,7 @@ import debounce from 'lodash.debounce';
 import getRefs from './js/get-refs';
 import ImagesApiService from './js/apiService';
 import imagesTpl from './imagesTemplate.hbs';
+import LazyLoad from 'vanilla-lazyload';
 
 
 const refs = getRefs();
@@ -37,7 +38,7 @@ function onSearch(e) {
 }
 
 async function fetchImages() {
-
+ 
   try {
     const response = await imagesApiService.fetchImages()
     const images = appendImagesMarkup(response);
@@ -50,9 +51,9 @@ async function fetchImages() {
   });
     }
     
-    if (imagesApiService.page > 2) {
-      window.scrollBy(0, window.innerHeight);
-    }
+    // if (imagesApiService.page > 2) {
+    //   window.scrollBy(0, window.innerHeight);
+    // }
     return images;
   } catch (error) {
     console.log(error)
@@ -61,6 +62,7 @@ async function fetchImages() {
 
 function appendImagesMarkup(data) {
   refs.imagesContainer.insertAdjacentHTML('beforeend', imagesTpl(data));
+  lazyLoading();
 }
 
 function clearImagesContainer() {
@@ -82,13 +84,12 @@ function onModalOpen(e) {
 }
 
 
-// IntersectionObserver
+// IntersectionObserver InfiniteScroll
 const onEntry = entries => {
 
   entries.forEach(entry => {
     console.log(imagesApiService.searchQuery);
         if (entry.isIntersecting && imagesApiService.searchQuery !== "" && imagesApiService.searchQuery !== undefined) {
-          console.log(entry);
           fetchImages();
         }  
     })
@@ -100,4 +101,33 @@ const options = {
 const observer = new IntersectionObserver(onEntry, options);
 
 observer.observe(refs.sentinel); 
+
+// Lazy Loading 
+function lazyLoading() {
+const targets = document.querySelectorAll('img');
+
+  const lazyLoad = target => {
+  const options = {
+    rootMargin: '150px',
+};
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      console.log('😍');
+
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        const src = img.getAttribute('data-lazy');
+
+        img.setAttribute('src', src);
+
+        observer.disconnect();
+      }
+    });
+  }, options);
+
+  io.observe(target)
+};
+
+targets.forEach(lazyLoad); 
+}
 
